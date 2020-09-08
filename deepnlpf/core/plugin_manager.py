@@ -68,6 +68,53 @@ class PluginManager:
 
         return result
 
+    def install_user_plugin(self, plugin_zip_url):
+        """
+        Download and install the plugin from an unofficial repository
+
+        Download and extract a zip archive into DeepNLPF's plugins root
+        directory then run the installation script `requirements.sh`
+
+        Arguments:
+            plugin_zip_url: str
+                The URL to a plugin's zip archive
+        Return: None
+        """
+        import re
+        import shutil
+        import zipfile
+
+        import homura
+
+        if not os.path.exists(self.PLUGIN_PATH):
+            os.makedirs(self.PLUGIN_PATH)
+
+        zipfile_path = os.path.join(self.PLUGIN_PATH, 'user_zip.zip')
+        try:
+            homura.download(url=plugin_zip_url, path=zipfile_path)
+        except Exception as err:
+            log.logger.error(err)
+            sys.exit(1)
+
+        plugin_root_dir = ''
+        with zipfile.ZipFile(zipfile_path) as zfd:
+            plugin_root_dir = zfd.namelist()[0]
+            zfd.extractall(self.PLUGIN_PATH)
+
+        extracted_path = os.path.join(self.PLUGIN_PATH, plugin_root_dir)
+        installation_dir = re.sub(r'^plugin_', '', plugin_root_dir)
+        installation_dir = re.sub(r'-master/?$', '', installation_dir)
+        installation_path = os.path.join(self.PLUGIN_PATH, installation_dir)
+
+        if os.path.exists(installation_path):
+            shutil.rmtree(installation_path)
+
+        os.rename(extracted_path, installation_path)
+        os.remove(zipfile_path)
+
+        install_script_path = os.path.join(installation_path, 'requirements.sh')
+        os.system(f'sh {install_script_path}')
+
     def install(self, plugin_name):
         import zipfile
         from homura import download  # gestor fast download file.

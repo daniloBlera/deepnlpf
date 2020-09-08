@@ -47,6 +47,12 @@ def install(args):
         print("❗️Wrong command!")
         print("⌨️ Try the command: deepnlpf --install <name_plugin>")
 
+def install_user_plugin(args):
+    if args:
+        from deepnlpf.core.plugin_manager import PluginManager
+        PluginManager().install_user_plugin(args)
+    else:
+        print("Command format: deepnlpf --install_user_plugin <plugin_url>")
 
 def uninstall(args):
     if args:
@@ -92,6 +98,13 @@ def main():
         help="Command for install plugin.",
         type=install,
         action="store",
+    )
+
+    my_parser.add_argument(
+        '--install_user_plugin',
+        help='Command for installing plugins from user repositories.',
+        type=install_user_plugin,
+        action='store',
     )
 
     my_parser.add_argument(
