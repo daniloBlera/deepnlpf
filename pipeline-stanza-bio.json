@@ -1,0 +1,15 @@
+{
+    "lang": "en",
+    "tools": {
+        "stanza-bio": {
+            "processors": [
+                "tokenize",
+                "pos",
+                "lemma",
+                "ner",
+                "depparse"
+            ],
+            "package": "craft"
+        }
+    }
+}
